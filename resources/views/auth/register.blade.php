@@ -2,6 +2,23 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+
+        <div class="mt-4">
+            <span class="text-gray-700 dark:text-gray-200">Role</span>
+            <div class="mt-2">
+                <label class="inline-flex items-center">
+                    <input type="radio" class="text-indigo-600 form-radio dark:bg-gray-800 focus:border-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" name="role" value="User" checked required/>
+                    <span class="ml-6 text-white">User</span>
+                </label>
+
+                <label class="inline-flex items-center ml-6">
+                    <input type="radio" class="text-indigo-600 form-radio dark:bg-gray-800 focus:border-indigo-500 focus:outline-none focus:shadow-outline-indigo focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" name="role" value="Organizer" required/>
+                    <span class="ml-6 text-white">Organizer</span>
+                </label>
+            </div>
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
@@ -12,7 +29,7 @@
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
