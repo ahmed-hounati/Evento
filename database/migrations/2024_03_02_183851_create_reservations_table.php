@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('event_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('event_id')->references('id')->on('events');
-            $table->boolean('valid')->default('false');
+            $table->boolean('valid')->default(0);
             $table->timestamps();
         });
     }
