@@ -15,9 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
+            $table->string('place');
+            $table->date('date');
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories');
-            $table->string('places');
+            $table->unsignedBigInteger('organizer_id');
+            $table->foreign('organizer_id')->references('id')->on('users');
+            $table->string('availablePlaces');
+            $table->boolean('auto_confirmation')->default(false);
             $table->timestamps();
         });
     }
