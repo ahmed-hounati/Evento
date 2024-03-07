@@ -1,5 +1,10 @@
 <x-app-layout>
     <div class="py-12">
+        @if (session('success'))
+            <div class="bg-green-500 text-white p-4 rounded">
+                {{ session('success') }}
+            </div>
+        @endif
         <form class="max-w-md mx-auto" action="{{route('user.search')}}" method="get">
             <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
             <div class="relative">
@@ -40,18 +45,40 @@
                         </div>
 
                         <div class="flex items-center justify-between mt-4">
-                            <a href="/events/{{$event->id}}/show" class="text-blue-600 dark:text-blue-400 hover:underline" tabindex="0" role="link">Read more</a>
+                            <a href="/events/{{$event->id}}/show" class="mb-4 text-blue-600 dark:text-blue-400 hover:underline" tabindex="0" role="link">Read more</a>
                             <div class="flex items-center">
                                 <a class="font-bold text-gray-700 cursor-pointer dark:text-gray-200" tabindex="0" role="link">{{$event->organizer_name}}</a>
                             </div>
                         </div>
-                        @if (auth()->user() && auth()->user()->hasReserve($event->id))
-                            <p class=" mt-4 focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Already reserved</p>
-                        @else
-                            <form action="{{ route('event.book', $event) }}" method="POST">
-                                @csrf
-                                <button type="button" class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Reserver</button>
-                            </form>
+                        @php
+                            $userArchived = auth()->user() && auth()->user()->archive;
+                        @endphp
+
+                        @if (auth()->user())
+                            @php
+                                $reservation = auth()->user()->reservations()->where('event_id', $event->id)->first();
+                            @endphp
+
+                            @if($reservation)
+                                @if($reservation->valid || $event->auto_confirmation)
+                                    <a href="{{ route('event.ticket', $event->id) }}" class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Show Ticket</a>
+                                @else
+                                    <p class="mt-4 focus:outline-none text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-500">Waiting for acceptance</p>
+                                @endif
+                            @else
+                                @php
+                                    $confirmedReservations = $event->reservations()->where('valid', 1)->count();
+                                @endphp
+
+                                @if($event->availablePlaces > $confirmedReservations)
+                                    <form action="{{ route('event.book', $event) }}" method="POST">
+                                        @csrf
+                                        <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Reserve</button>
+                                    </form>
+                                @else
+                                    <p class="mt-4 focus:outline-none text-red-500 hover:text-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-500">Sold Out</p>
+                                @endif
+                            @endif
                         @endif
                     </div>
                 @endforeach

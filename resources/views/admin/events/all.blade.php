@@ -5,6 +5,7 @@
                 {{ session('success') }}
             </div>
         @endif
+
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
@@ -20,28 +21,22 @@
                         </div>
 
                         <div class="flex items-center justify-between mt-4">
-                            <a href="/events/{{$event->id}}/show" class="text-blue-600 dark:text-blue-400 hover:underline" tabindex="0" role="link">Read more</a>
+                            <a href="/events/{{$event->id}}/show" class="mb-4 text-blue-600 dark:text-blue-400 hover:underline" tabindex="0" role="link">Read more</a>
                             <div class="flex items-center">
                                 <a class="font-bold text-gray-700 cursor-pointer dark:text-gray-200" tabindex="0" role="link">{{$event->organizer_name}}</a>
                             </div>
                         </div>
-                        <div class="flex justify-items-center">
-                            @if($event->organizer_id == auth()->user()->id)
-                            <a href="{{ route('events.reservations', $event->id) }}" class="mt-4 focus:outline-none text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-500">Reservations</a>
-                            <a href="{{ route('events.edit', $event->id) }}" class="mt-4 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Update</a>
-                            <form method="POST" action="{{ route('events.destroy', $event->id) }}">
+                        @if($event->valid)
+                            <p class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Already valid</p>
+                        @else
+                            <form action="{{ route('event.valid', $event->id) }}" method="POST">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="mt-4 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Delete</button>
+                                <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Valid</button>
                             </form>
-                            @endif
-                        </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
-            <a href="/events/create"
-               class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 fixed bottom-4 right-4"><i
-                    class="fa-solid fa-plus fa-xl"></i></a>
         </div>
     </div>
 </x-app-layout>

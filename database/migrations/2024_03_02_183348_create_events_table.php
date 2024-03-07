@@ -21,8 +21,9 @@ return new class extends Migration
             $table->foreign('category_id')->references('id')->on('categories');
             $table->unsignedBigInteger('organizer_id');
             $table->foreign('organizer_id')->references('id')->on('users');
-            $table->string('availablePlaces');
+            $table->integer('availablePlaces');
             $table->boolean('auto_confirmation')->default(false);
+            $table->boolean('valid')->default(false);
             $table->timestamps();
         });
     }

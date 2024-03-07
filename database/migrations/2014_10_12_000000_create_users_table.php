@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->enum('role', ['Admin', 'Organizer', 'User'])->default('User');
+            $table->boolean('archive')->default(false);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

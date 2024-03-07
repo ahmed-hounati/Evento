@@ -11,12 +11,13 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::join('categories', 'events.category_id', '=', 'categories.id')
+            ->where('valid', true)
             ->select('events.*', 'categories.name as category_name')
             ->get();
-        $organizer = Event::join('users', 'events.organizer_id', '=', 'users.id')
+        $organizers = Event::join('users', 'events.organizer_id', '=', 'users.id')
             ->select('events.*', 'users.name as organizer_name')
             ->get();
-        return view('organizer.events.all', ['events' => $events ,'organizer'=>$organizer]);
+        return view('organizer.events.all', ['events' => $events ,'organizers'=>$organizers]);
     }
     public function create(){
         $categories = Category::all();
@@ -32,7 +33,6 @@ class EventController extends Controller
             'date' => ['required'],
             'availablePlaces' => ['required'],
             'auto_confirmation' => ['required'],
-            'category_id' => ['required'],
         ]);
 
         Event::create(
@@ -55,6 +55,7 @@ class EventController extends Controller
 
     public function edit($id)
     {
+        $categories = Category::all();
         $events = Event::findOrFail($id)->join('categories', 'events.category_id', '=', 'categories.id')
             ->select('events.*', 'categories.name as category_name')
             ->get();
@@ -62,12 +63,11 @@ class EventController extends Controller
             ->where('events.id', '=', $id)
             ->select('events.*', 'users.name as organizer_name')
             ->first();
-        return view('organizer.events.edit', ['events' => $events,'organizer'=>$organizer]);
+        return view('organizer.events.edit', ['events' => $events,'organizer'=>$organizer, 'categories' => $categories]);
     }
 
     public function update(Request $request, $id)
     {
-        // Validate the request data
         $request->validate([
             'title' => ['required'],
             'description' => ['required'],
@@ -95,19 +95,19 @@ class EventController extends Controller
     {
         $categories = Category::all();
 
-        $events = Event::join('categories', 'events.category_id', '=', 'categories.id')
-            ->join('users', 'events.organizer_id', '=', 'users.id')
-            ->select('events.*', 'categories.name as category_name', 'users.name as organizer_name');
-
         $category = $request->get('category_name');
 
+        $eventsQuery = Event::join('categories', 'events.category_id', '=', 'categories.id')
+            ->where('valid', true);
+
         if ($category) {
-            $events = $events->where('categories.name', $category);
+            $eventsQuery->where('categories.name', $category);
         }
 
-        $events = $events->paginate(9);
+        $events = $eventsQuery->select('events.*', 'categories.name as category_name')
+            ->paginate(9);
 
-        return view('user.events.all', ['events' => $events, 'categories' => $categories]);
+        return view('user.events.all', compact('events', 'categories'));
     }
 
     public function search(Request $request)
@@ -121,4 +121,25 @@ class EventController extends Controller
         $events = $events->paginate(9);
         return view('user.events.search', ['events' => $events, 'categories' => $categories]);
     }
+
+
+    public function allEvents()
+    {
+        $events = Event::join('categories', 'events.category_id', '=', 'categories.id')
+            ->select('events.*', 'categories.name as category_name')
+            ->get();
+        $organizer = Event::join('users', 'events.organizer_id', '=', 'users.id')
+            ->select('events.*', 'users.name as organizer_name')
+            ->get();
+        return view('admin.events.all', ['events' => $events ,'organizer'=>$organizer]);
+    }
+
+    public function valid($id)
+    {
+        $event = Event::findOrFail($id);
+        $event->valid = 1;
+        $event->save();
+        return redirect()->route('event.all')->with('success', 'Event validated successfully!');
+    }
+
 }

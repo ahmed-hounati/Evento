@@ -32,7 +32,7 @@
 
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
+            <div class="grid grid-cols-1 mb-6 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
                 @foreach($events as $event)
                     <div class="max-w-2xl px-8 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
                         <div class="flex items-center justify-between">
@@ -50,22 +50,34 @@
                                     <a class="font-bold text-gray-700 cursor-pointer dark:text-gray-200" tabindex="0" role="link">{{$event->organizer_name}}</a>
                             </div>
                         </div>
+                        @php
+                            $userArchived = auth()->user() && auth()->user()->archive;
+                        @endphp
+
                         @if (auth()->user())
                             @php
                                 $reservation = auth()->user()->reservations()->where('event_id', $event->id)->first();
                             @endphp
 
                             @if($reservation)
-                                @if($reservation->valid)
+                                @if($reservation->valid || $event->auto_confirmation)
                                     <a href="{{ route('event.ticket', $event->id) }}" class="focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Show Ticket</a>
                                 @else
                                     <p class="mt-4 focus:outline-none text-white bg-yellow-500 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:focus:ring-yellow-500">Waiting for acceptance</p>
                                 @endif
                             @else
-                                <form action="{{ route('event.book', $event) }}" method="POST">
-                                    @csrf
-                                    <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Reserve</button>
-                                </form>
+                                @php
+                                    $confirmedReservations = $event->reservations()->where('valid', 1)->count();
+                                @endphp
+
+                                @if($event->availablePlaces > $confirmedReservations)
+                                    <form action="{{ route('event.book', $event) }}" method="POST">
+                                        @csrf
+                                        <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Reserve</button>
+                                    </form>
+                                @else
+                                    <p class="focus:outline-none text-white hover:text-white focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-500">Sold Out</p>
+                                @endif
                             @endif
                         @endif
                     </div>
