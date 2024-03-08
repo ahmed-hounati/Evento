@@ -33,8 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{event}/show', [EventController::class, 'show'])->name('events.show');
 });
 
-Route::group(['middleware' => 'user'], function() {
-    Route::get('/user/dashboard', [UserController::class, 'user'])->name('user.dashboard');
+Route::group(['middleware' => 'organizer'], function() {
+    Route::get('/organizer/dashboard', [UserController::class, 'organizer'])->name('organizer.dashboard');
     Route::get('/organizer/all', [EventController::class, 'index'])->name('organizer.all');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events/store', [EventController::class, 'store'])->name('events.store');
@@ -45,8 +45,8 @@ Route::group(['middleware' => 'user'], function() {
     Route::post('/reservation/{reservation}/valid', [ReservationController::class, 'valid'])->name('reservation.valid');
 });
 
-Route::group(['middleware' => 'organizer'], function() {
-    Route::get('/organizer/dashboard', [UserController::class, 'organizer'])->name('organizer.dashboard');
+Route::group(['middleware' => 'user'], function() {
+    Route::get('/user/dashboard', [UserController::class, 'user'])->name('user.dashboard');
     Route::get('/user/all', [EventController::class, 'user'])->name('user.all');
     Route::get('/user/search', [EventController::class, 'search'])->name('user.search');
     Route::post('/event/{event}/book', [ReservationController::class, 'store'])->name('event.book');

@@ -43,14 +43,14 @@ class EventController extends Controller
     }
     public function show($id)
     {
-        $events = Event::findOrFail($id)->join('categories', 'events.category_id', '=', 'categories.id')
+        $event = Event::findOrFail($id)->join('categories', 'events.category_id', '=', 'categories.id')
         ->select('events.*', 'categories.name as category_name')
-        ->get();
+        ->first();
         $organizer = Event::join('users', 'events.organizer_id', '=', 'users.id')
             ->where('events.id', '=', $id)
             ->select('events.*', 'users.name as organizer_name')
             ->first();
-        return view('organizer.events.show', ['events' => $events,'organizer'=>$organizer]);
+        return view('organizer.events.show', ['event' => $event,'organizer'=>$organizer]);
     }
 
     public function edit($id)

@@ -3,7 +3,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3">
-                @foreach($events as $event)
                     <div class="max-w-2xl px-8 py-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-light text-gray-600 dark:text-gray-400">{{$event->date}}</span>
@@ -21,7 +20,6 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
             </div>
         </div>
     </div>
